@@ -36,6 +36,8 @@ services:
     image: sonnesen/node
     container_name: node
     command: dockerize -wait tcp://mysql:3306 -timeout 10s npm start
+    volumes:
+      - ./node/app:/app
     networks:
       - nodenet
     depends_on:
