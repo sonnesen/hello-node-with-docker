@@ -13,8 +13,6 @@ COPY ./app/package*.json .
 
 RUN npm install
 
-WORKDIR /app
-
 COPY ./app/index.js .
 
 EXPOSE 3000
