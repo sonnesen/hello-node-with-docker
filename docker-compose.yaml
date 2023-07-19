@@ -2,12 +2,14 @@ version: '3'
 
 services:
   mysql:
-    image: mysql:8.0.33
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
     container_name: mysql
+    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
     command: --default-authentication-plugin=mysql_native_password --innodb-use-native-aio=0
     restart: always
-    networks:
-      - nodenet
     environment:
       - MYSQL_ROOT_PASSWORD=rootpwd
       - MYSQL_DATABASE=peopledb  
@@ -20,10 +22,7 @@ services:
     build: 
       context: ./nginx
       dockerfile: Dockerfile
-    image: sonnesen/nginx
     container_name: nginx
-    networks:
-      - nodenet
     ports:
       - "8080:80"
     depends_on:
@@ -33,16 +32,9 @@ services:
     build:
       context: ./node
       dockerfile: Dockerfile
-    image: sonnesen/node
     container_name: node
-    command: dockerize -wait tcp://mysql:3306 -timeout 10s npm start
+    command: dockerize -wait tcp://mysql:3306 -timeout 20s npm start
     volumes:
       - ./node/app:/app
-    networks:
-      - nodenet
     depends_on:
       - mysql
-
-networks:
-  nodenet:
-    driver: bridge
